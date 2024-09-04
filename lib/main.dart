@@ -1,6 +1,6 @@
 /*
  *  This file is part of BlackHole (https://github.com/Sangwan5688/BlackHole).
- * 
+ *
  * BlackHole is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with BlackHole.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Copyright (c) 2021-2023, Ankit Sangwan
  */
 
@@ -36,6 +36,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 // import 'package:home_widget/home_widget.dart';
@@ -43,7 +44,6 @@ import 'package:logging/logging.dart';
 import 'package:metadata_god/metadata_god.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
-import 'package:sizer/sizer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -135,7 +135,7 @@ Future<void> openHiveBox(String boxName, {bool limit = false}) async {
 //     } else if (data?.path == '/skipPrevious') {
 //       audioHandler.skipToPrevious();
 //     }
-
+//
 //     // await HomeWidget.saveWidgetData<String>(
 //     //   'title',
 //     //   audioHandler?.mediaItem.value?.title,
@@ -159,13 +159,11 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale _locale = const Locale('en', '');
-  late StreamSubscription _intentTextStreamSubscription;
   late StreamSubscription _intentDataStreamSubscription;
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void dispose() {
-    _intentTextStreamSubscription.cancel();
     _intentDataStreamSubscription.cancel();
     super.dispose();
   }
@@ -189,32 +187,9 @@ class _MyAppState extends State<MyApp> {
     });
 
     if (Platform.isAndroid || Platform.isIOS) {
-      // For sharing or opening urls/text coming from outside the app while the app is in the memory
-      _intentTextStreamSubscription =
-          ReceiveSharingIntent.getTextStream().listen(
-        (String value) {
-          Logger.root.info('Received intent on stream: $value');
-          handleSharedText(value, navigatorKey);
-        },
-        onError: (err) {
-          Logger.root.severe('ERROR in getTextStream', err);
-        },
-      );
-
-      // For sharing or opening urls/text coming from outside the app while the app is closed
-      ReceiveSharingIntent.getInitialText().then(
-        (String? value) {
-          Logger.root.info('Received Intent initially: $value');
-          if (value != null) handleSharedText(value, navigatorKey);
-        },
-        onError: (err) {
-          Logger.root.severe('ERROR in getInitialTextStream', err);
-        },
-      );
-
       // For sharing files coming from outside the app while the app is in the memory
       _intentDataStreamSubscription =
-          ReceiveSharingIntent.getMediaStream().listen(
+          ReceiveSharingIntent.instance.getMediaStream().listen(
         (List<SharedMediaFile> value) {
           if (value.isNotEmpty) {
             for (final file in value) {
@@ -231,6 +206,9 @@ class _MyAppState extends State<MyApp> {
                 ).then(
                   (value) => navigatorKey.currentState?.pushNamed('/playlists'),
                 );
+              } else if (file.path.endsWith('.txt') ||
+                  file.path.endsWith('.text')) {
+                handleSharedText(file.path, navigatorKey);
               }
             }
           }
@@ -241,7 +219,8 @@ class _MyAppState extends State<MyApp> {
       );
 
       // For sharing files coming from outside the app while the app is closed
-      ReceiveSharingIntent.getInitialMedia()
+      ReceiveSharingIntent.instance
+          .getInitialMedia()
           .then((List<SharedMediaFile> value) {
         if (value.isNotEmpty) {
           for (final file in value) {
@@ -258,6 +237,9 @@ class _MyAppState extends State<MyApp> {
               ).then(
                 (value) => navigatorKey.currentState?.pushNamed('/playlists'),
               );
+            } else if (file.path.endsWith('.txt') ||
+                file.path.endsWith('.text')) {
+              handleSharedText(file.path, navigatorKey);
             }
           }
         }
@@ -304,7 +286,9 @@ class _MyAppState extends State<MyApp> {
         builder: (context, constraints) {
           return OrientationBuilder(
             builder: (context, orientation) {
-              SizerUtil.setScreenSize(constraints, orientation);
+              ScreenUtil.init(
+                context,
+              );
               return MaterialApp(
                 title: 'BlackHole',
                 restorationScopeId: 'blackhole',

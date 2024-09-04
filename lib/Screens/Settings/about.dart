@@ -8,6 +8,7 @@ import 'package:blackhole/Helpers/update.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -299,7 +300,7 @@ class _AboutPageState extends State<AboutPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: const Icon(
+                                            icon: Icon(
                                               MdiIcons.gmail,
                                             ),
                                             iconSize: 40,
@@ -331,7 +332,7 @@ class _AboutPageState extends State<AboutPage> {
                                         children: [
                                           IconButton(
                                             icon: const Icon(
-                                              MdiIcons.telegram,
+                                              FontAwesomeIcons.telegram,
                                             ),
                                             iconSize: 40,
                                             tooltip: AppLocalizations.of(
@@ -361,7 +362,7 @@ class _AboutPageState extends State<AboutPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: const Icon(
+                                            icon: Icon(
                                               MdiIcons.instagram,
                                             ),
                                             iconSize: 40,
@@ -425,7 +426,7 @@ class _AboutPageState extends State<AboutPage> {
                                         children: [
                                           IconButton(
                                             icon: const Icon(
-                                              MdiIcons.telegram,
+                                              FontAwesomeIcons.telegram,
                                             ),
                                             iconSize: 40,
                                             tooltip: AppLocalizations.of(
@@ -456,7 +457,7 @@ class _AboutPageState extends State<AboutPage> {
                                         children: [
                                           IconButton(
                                             icon: const Icon(
-                                              MdiIcons.telegram,
+                                              FontAwesomeIcons.telegram,
                                             ),
                                             iconSize: 40,
                                             tooltip: AppLocalizations.of(
